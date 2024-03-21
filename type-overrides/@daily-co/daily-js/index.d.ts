@@ -480,6 +480,7 @@ export interface DailyCpuLoadStats {
         fps: number;
         frameDecodeTimeSec: number;
         interFrameDelayStandardDeviation: number;
+        cpuUsageBasedOnTargetDecode: number;
       }[];
     };
   };
