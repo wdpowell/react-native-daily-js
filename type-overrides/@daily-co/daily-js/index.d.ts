@@ -87,6 +87,8 @@ export type DailyEvent =
   | 'waiting-participant-removed'
   | 'available-devices-updated'
   | 'receive-settings-updated'
+  | 'local-audio-level'
+  | 'remote-participants-audio-level'
   | 'dialin-connected'
   | 'dialin-error'
   | 'dialin-stopped'
@@ -130,6 +132,7 @@ export type DailyFatalErrorType =
 
 export type DailyNonFatalErrorType =
   | 'screen-share-error'
+  | 'local-audio-level-observer-error'
   | 'remote-media-player-error'
   | 'live-streaming-warning'
   | 'meeting-session-data-error';
@@ -493,6 +496,10 @@ interface DailySendSettings {
     | DailyVideoSendSettings
     | DailyVideoSendSettingsPreset
     | undefined;
+}
+
+export interface DailyParticipantsAudioLevel {
+  [participantId: string]: number;
 }
 
 export type DailyVideoSendSettingsPreset =
@@ -907,6 +914,16 @@ export interface DailyEventObjectSendSettingsUpdated {
   sendSettings: DailySendSettings;
 }
 
+export interface DailyEventObjectLocalAudioLevel {
+  action: Extract<DailyEvent, 'local-audio-level'>;
+  audioLevel: number;
+}
+
+export interface DailyEventObjectRemoteParticipantsAudioLevel {
+  action: Extract<DailyEvent, 'remote-participants-audio-level'>;
+  participantsAudioLevel: DailyParticipantsAudioLevel;
+}
+
 export interface DailyEventObjectLiveStreamingStarted {
   action: Extract<DailyEvent, 'live-streaming-started'>;
   layout?: DailyLiveStreamingLayoutConfig<'start'>;
@@ -1087,6 +1104,10 @@ export type DailyEventObject<T extends DailyEvent = any> =
     ? DailyEventObjectDialOutStopped
     : T extends DailyEventObjectDialOutWarning['action']
     ? DailyEventObjectDialOutWarning
+    : T extends DailyEventObjectLocalAudioLevel['action']
+    ? DailyEventObjectLocalAudioLevel
+    : T extends DailyEventObjectRemoteParticipantsAudioLevel['action']
+    ? DailyEventObjectRemoteParticipantsAudioLevel
     : any;
 
 export type DailyNativeInCallAudioMode = 'video' | 'voice';
@@ -1353,6 +1374,12 @@ export interface DailyCall {
     receiveSettings: DailyReceiveSettingsUpdates
   ): Promise<DailyReceiveSettings>;
   startCamera(properties?: DailyCallOptions): Promise<void>;
+  startLocalAudioLevelObserver(interval?: number): Promise<void>;
+  stopLocalAudioLevelObserver(): void;
+  getLocalAudioLevel(): number;
+  startRemoteParticipantsAudioLevelObserver(interval?: number): Promise<void>;
+  stopRemoteParticipantsAudioLevelObserver(): void;
+  getRemoteParticipantsAudioLevel(): DailyParticipantsAudioLevel;
   cycleCamera(): Promise<{
     device: { facingMode: DailyCameraFacingMode } | null;
   }>;
