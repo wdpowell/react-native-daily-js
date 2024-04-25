@@ -11,6 +11,7 @@ static NSString *const NotificationScreenCaptureExtensionStarted = @"ScreenCaptu
 // Event to JS layer
 static NSString *const EventSystemScreenCaptureStop = @"EventSystemScreenCaptureStop";
 static NSString *const EventSystemScreenCaptureStart = @"EventSystemScreenCaptureStart";
+static NSString *const EventOnHostDestroy = @"EventOnHostDestroy";
 
 @interface DailyNativeUtils()
 
@@ -53,8 +54,22 @@ RCT_EXPORT_MODULE()
                                            selector:@selector(handleNotificationScreenCaptureExtensionStarted)
                                                name:NotificationScreenCaptureExtensionStarted
                                              object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                          selector:@selector(applicationWillTerminate)
+                                              name:UIApplicationWillTerminateNotification
+                                            object:nil];
   }
   return self;
+}
+
+- (void)applicationWillTerminate {
+    NSLog(@"App is about to terminate");
+    BOOL isStillOnMeeting = _requestersKeepingDeviceAwake.count > 0;
+    if (isStillOnMeeting) {
+        [self sendEventWithName:EventOnHostDestroy body:nil];
+        NSLog(@"Triggered the event EventOnHostDestroy");
+    }
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -65,7 +80,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[EventSystemScreenCaptureStop, EventSystemScreenCaptureStart];
+  return @[EventSystemScreenCaptureStop, EventSystemScreenCaptureStart, EventOnHostDestroy];
 }
 
 #pragma mark Public

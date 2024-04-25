@@ -20,6 +20,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 
@@ -35,6 +36,7 @@ public class DailyNativeUtils extends ReactContextBaseJavaModule implements Perm
     private static int PERMISSION_REQUEST_CODE = 666;
 
     private final ReactApplicationContext reactContext;
+    private DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
     private Set<String> requestersKeepingDeviceAwake = new HashSet<>();
     private Set<String> requestersShowingOngoingMeetingNotification = new HashSet<>();
 
@@ -57,12 +59,15 @@ public class DailyNativeUtils extends ReactContextBaseJavaModule implements Perm
 
             @Override
             public void onHostDestroy() {
+                eventEmitter.emit("EventOnHostDestroy", Arguments.createMap());
                 DailyOngoingMeetingForegroundService.stop(reactContext);
-                // This seems extreme, but the process won't otherwise immediately stop sending
-                // audio and video
-                Process.killProcess(Process.myPid());
             }
         });
+    }
+
+    @Override
+    public void initialize() {
+        this.eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
     }
 
     @Override
