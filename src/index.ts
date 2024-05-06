@@ -25,12 +25,20 @@ const dailyNativeUtilsEventEmitter = new NativeEventEmitter(DailyNativeUtils);
 let hasAudioFocus: boolean;
 let appState: AppStateStatus;
 const audioFocusChangeListeners: Set<(hasFocus: boolean) => void> = new Set();
-const appActiveStateChangeListeners: Set<(isActive: boolean) => void> =
-  new Set();
+
+export type DailyAppStateEvent = 'active' | 'inactive' | 'destroyed';
+const appStateChangeListeners: Set<
+  (appState: DailyAppStateEvent) => void
+> = new Set();
+
 const systemScreenCaptureStopListeners: Set<() => void> = new Set();
 let systemScreenCaptureStartCallback: { (): void } | null;
 
 function setupEventListeners() {
+  dailyNativeUtilsEventEmitter.addListener('EventOnHostDestroy', () => {
+    appStateChangeListeners.forEach((listener) => listener('destroyed'));
+  });
+
   // audio focus: used by daily-js to auto-mute mic, for instance
   if (Platform.OS === 'android') {
     hasAudioFocus = true; // safe assumption, hopefully
@@ -56,7 +64,9 @@ function setupEventListeners() {
     const wasActive = previousState === 'active';
     const isActive = appState === 'active';
     if (wasActive !== isActive) {
-      appActiveStateChangeListeners.forEach((listener) => listener(isActive));
+      appStateChangeListeners.forEach((listener) =>
+        listener(isActive ? 'active' : 'inactive')
+      );
     }
   });
 
@@ -127,15 +137,15 @@ function setupGlobals(): void {
     removeAudioFocusChangeListener: (listener: (hasFocus: boolean) => void) => {
       audioFocusChangeListeners.delete(listener);
     },
-    addAppActiveStateChangeListener: (
-      listener: (isActive: boolean) => void
+    addAppStateChangeListener: (
+      listener: (appState: DailyAppStateEvent) => void
     ) => {
-      appActiveStateChangeListeners.add(listener);
+      appStateChangeListeners.add(listener);
     },
-    removeAppActiveStateChangeListener: (
-      listener: (isActive: boolean) => void
+    removeAppStateChangeListener: (
+      listener: (appState: DailyAppStateEvent) => void
     ) => {
-      appActiveStateChangeListeners.delete(listener);
+      appStateChangeListeners.delete(listener);
     },
     addSystemScreenCaptureStopListener: (listener: () => void) => {
       systemScreenCaptureStopListeners.add(listener);
