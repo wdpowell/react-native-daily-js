@@ -205,7 +205,6 @@ export interface DailyAdvancedConfig {
    */
   camSimulcastEncodings?: CamSimulcastEncoding[];
   v2CamAndMic?: boolean;
-  experimentalGetUserMediaConstraintsModify?: (constraints: any) => void;
   micAudioMode?: 'music' | 'speech';
   userMediaAudioConstraints?: MediaTrackConstraints;
   userMediaVideoConstraints?: MediaTrackConstraints;
