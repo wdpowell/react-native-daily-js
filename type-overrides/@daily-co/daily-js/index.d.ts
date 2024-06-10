@@ -1120,6 +1120,15 @@ export interface DailyCallStaticUtils {
   supportedBrowser(): DailyBrowserInfo;
 }
 
+export interface DailyScreenShareUpdateOptions {
+  screenVideo: {
+    enabled: boolean;
+  };
+  screenAudio: {
+    enabled: boolean;
+  };
+}
+
 export type DailyCameraFacingMode = 'user' | 'environment';
 
 type DailyStreamingParticipantsSortMethod = 'active';
@@ -1364,6 +1373,9 @@ export interface DailyCall {
   localVideo(): boolean;
   setLocalAudio(enabled: boolean): DailyCall;
   setLocalVideo(enabled: boolean): DailyCall;
+  localScreenAudio(): boolean;
+  localScreenVideo(): boolean;
+  updateScreenShare(options?: DailyScreenShareUpdateOptions): void;
   getReceiveSettings(
     id: string,
     options?: { showInheritedValues: boolean }
