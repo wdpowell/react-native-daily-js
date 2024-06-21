@@ -1058,8 +1058,6 @@ export interface DailyEventObjectDialOutWarning extends DailyEventObjectBase {
 export type DailyEventObject<T extends DailyEvent = any> =
   T extends DailyEventObjectAppMessage['action']
     ? DailyEventObjectAppMessage
-    : T extends DailyEventObjectTranscriptionMessage['action']
-    ? DailyEventObjectTranscriptionMessage
     : T extends DailyEventObjectNoPayload['action']
     ? DailyEventObjectNoPayload
     : T extends DailyEventObjectCameraError['action']
@@ -1080,6 +1078,14 @@ export type DailyEventObject<T extends DailyEvent = any> =
     ? DailyEventObjectLiveStreamingStopped
     : T extends DailyEventObjectLiveStreamingError['action']
     ? DailyEventObjectLiveStreamingError
+    : T extends DailyEventObjectTranscriptionStarted['action']
+    ? DailyEventObjectTranscriptionStarted
+    : T extends DailyEventObjectTranscriptionMessage['action']
+    ? DailyEventObjectTranscriptionMessage
+    : T extends DailyEventObjectTranscriptionStopped['action']
+    ? DailyEventObjectTranscriptionStopped
+    : T extends DailyEventObjectTranscriptionError['action']
+    ? DailyEventObjectTranscriptionError
     : T extends DailyEventObjectParticipant['action']
     ? DailyEventObjectParticipant
     : T extends DailyEventObjectParticipantLeft['action']
