@@ -1426,9 +1426,11 @@ export interface DailyCall {
   ): Promise<DailyReceiveSettings>;
   startCamera(properties?: DailyCallOptions): Promise<void>;
   startLocalAudioLevelObserver(interval?: number): Promise<void>;
+  isLocalAudioLevelObserverRunning(): boolean;
   stopLocalAudioLevelObserver(): void;
   getLocalAudioLevel(): number;
   startRemoteParticipantsAudioLevelObserver(interval?: number): Promise<void>;
+  isRemoteParticipantsAudioLevelObserverRunning(): boolean;
   stopRemoteParticipantsAudioLevelObserver(): void;
   getRemoteParticipantsAudioLevel(): DailyParticipantsAudioLevel;
   cycleCamera(): Promise<{
