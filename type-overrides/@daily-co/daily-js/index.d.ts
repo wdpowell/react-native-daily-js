@@ -291,6 +291,7 @@ export interface DailyParticipantTracks {
   video: DailyTrackState;
   screenAudio: DailyTrackState;
   screenVideo: DailyTrackState;
+  [customTrackKey: string]: DailyTrackState | undefined;
 }
 
 export interface DailyParticipant {
@@ -325,9 +326,7 @@ export interface DailyParticipant {
   screen: boolean;
 
   // track state
-  tracks: DailyParticipantTracks & {
-    [customTrackKey: string]: DailyTrackState;
-  };
+  tracks: DailyParticipantTracks;
 
   // user/session info
   user_id: string;
