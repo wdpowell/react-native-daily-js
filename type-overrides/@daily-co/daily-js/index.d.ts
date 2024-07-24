@@ -19,6 +19,7 @@ import RTCRtpEncodingParameters from '@daily-co/react-native-webrtc/lib/typescri
  */
 
 export type DailyLanguage =
+  | 'da'
   | 'de'
   | 'en'
   | 'fi'
