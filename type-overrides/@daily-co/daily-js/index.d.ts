@@ -19,6 +19,7 @@ import RTCRtpEncodingParameters from '@daily-co/react-native-webrtc/lib/typescri
  */
 
 export type DailyLanguage =
+  | 'da'
   | 'de'
   | 'en'
   | 'fi'
@@ -173,7 +174,9 @@ export interface DailyLoadOptions extends DailyCallOptions {
 }
 
 export interface DailyFactoryOptions extends DailyCallOptions {
-  strictMode?: boolean; // only available at constructor time
+  // only available at constructor time
+  allowMultipleCallInstances?: boolean;
+  strictMode?: boolean;
 }
 
 export interface CamSimulcastEncoding {
