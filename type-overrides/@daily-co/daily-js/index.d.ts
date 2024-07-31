@@ -337,6 +337,7 @@ export interface DailyParticipant {
   userData?: unknown;
   session_id: string;
   joined_at?: Date;
+  networkThreshold?: 'good' | 'low' | 'very-low';
   will_eject_at: Date;
   local: boolean;
   owner: boolean;
