@@ -337,6 +337,7 @@ export interface DailyParticipant {
   userData?: unknown;
   session_id: string;
   joined_at?: Date;
+  networkThreshold?: 'good' | 'low' | 'very-low';
   will_eject_at: Date;
   local: boolean;
   owner: boolean;
@@ -538,6 +539,7 @@ export interface DailyRoomInfo {
     enable_breakout_rooms?: boolean;
     enable_emoji_reactions?: boolean;
     enable_chat?: boolean;
+    enable_shared_chat_history?: boolean;
     enable_knocking?: boolean;
     enable_network_ui?: boolean;
     enable_noise_cancellation_ui?: boolean;
