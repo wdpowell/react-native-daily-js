@@ -1036,6 +1036,7 @@ export interface DailyEventObjectDialinWarning extends DailyEventObjectBase {
 export interface DailyEventObjectDialOutConnected extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialout-connected'>;
   sessionId?: string;
+  userId?: string;
   actionTraceId?: string;
 }
 
@@ -1043,12 +1044,14 @@ export interface DailyEventObjectDialOutError extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialout-error'>;
   errorMsg: string;
   sessionId?: string;
+  userId?: string;
   actionTraceId?: string;
 }
 
 export interface DailyEventObjectDialOutStopped extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialout-stopped'>;
   sessionId?: string;
+  userId?: string;
   actionTraceId?: string;
 }
 
@@ -1056,6 +1059,7 @@ export interface DailyEventObjectDialOutWarning extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialout-warning'>;
   errorMsg: string;
   sessionId?: string;
+  userId?: string;
   actionTraceId?: string;
 }
 
