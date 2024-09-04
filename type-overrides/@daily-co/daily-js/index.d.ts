@@ -69,6 +69,7 @@ export type DailyEvent =
   | 'active-speaker-change'
   | 'network-quality-change'
   | 'network-connection'
+  | 'test-completed'
   | 'cpu-load-change'
   | 'error'
   | 'nonfatal-error'
@@ -421,6 +422,56 @@ export interface DailyStartScreenShare {
   screenVideoSendSettings?:
     | DailyVideoSendSettings
     | DailyScreenVideoSendSettingsPreset;
+}
+
+export type DailyQualityTestResult =
+  | 'good'
+  | 'bad'
+  | 'warning'
+  | 'aborted'
+  | 'failed';
+
+export type DailyP2PCallQualityTestResults =
+  | DailyP2PCallQualityTestStats
+  | DailyCallQualityTestAborted
+  | DailyCallQualityTestFailure;
+
+export interface DailyP2PCallQualityTestStats {
+  result: Extract<DailyQualityTestResult, 'good' | 'warning' | 'bad'>;
+  data: DailyP2PCallQualityTestData;
+  secondsElapsed: number;
+}
+
+export interface DailyP2PCallQualityTestData {
+  maxRoundTripTime: number | null;
+  avgRoundTripTime: number | null;
+  avgRecvPacketLoss: number | null;
+  avgAvailableOutgoingBitrate: number | null;
+  avgSendBitsPerSecond: number | null;
+  avgRecvBitsPerSecond: number | null;
+}
+
+export interface DailyCallQualityTestAborted {
+  result: Extract<DailyQualityTestResult, 'aborted'>;
+  secondsElapsed: number;
+}
+
+export interface DailyCallQualityTestFailure {
+  result: Extract<DailyQualityTestResult, 'failed'>;
+  errorMsg: string;
+  error?: DailyFatalErrorObject<DailyFatalErrorType>;
+  secondsElapsed: number;
+}
+
+export interface DailyWebsocketConnectivityTestResults {
+  result: 'passed' | 'failed' | 'warning' | 'aborted';
+  abortedRegions: string[];
+  failedRegions: string[];
+  passedRegions: string[];
+}
+
+export interface DailyNetworkConnectivityTestStats {
+  result: 'passed' | 'failed' | 'aborted';
 }
 
 export interface DailyNetworkStats {
@@ -894,6 +945,15 @@ export interface DailyEventObjectNetworkConnectionEvent
   sfu_id?: string;
 }
 
+export interface DailyEventObjectTestCompleted extends DailyEventObjectBase {
+  action: Extract<DailyEvent, 'test-completed'>;
+  test: 'p2p-call-quality' | 'network-connectivity' | 'websocket-connectivity';
+  results:
+    | DailyP2PCallQualityTestResults
+    | DailyNetworkConnectivityTestStats
+    | DailyWebsocketConnectivityTestResults;
+}
+
 export interface DailyEventObjectActiveSpeakerChange
   extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'active-speaker-change'>;
@@ -1124,6 +1184,8 @@ export type DailyEventObject<T extends DailyEvent = any> =
     ? DailyEventObjectCpuLoadEvent
     : T extends DailyEventObjectNetworkConnectionEvent['action']
     ? DailyEventObjectNetworkConnectionEvent
+    : T extends DailyEventObjectTestCompleted['action']
+    ? DailyEventObjectTestCompleted
     : T extends DailyEventObjectActiveSpeakerChange['action']
     ? DailyEventObjectActiveSpeakerChange
     : T extends DailyEventObjectReceiveSettingsUpdated['action']
@@ -1492,6 +1554,17 @@ export interface DailyCall {
   load(properties?: DailyLoadOptions): Promise<void>;
   startScreenShare(properties?: DailyStartScreenShare): void;
   stopScreenShare(): void;
+  testPeerToPeerCallQuality(options: {
+    videoTrack: MediaStreamTrack;
+    duration?: number;
+  }): Promise<DailyP2PCallQualityTestResults>;
+  stopTestPeerToPeerCallQuality(): void;
+  testWebsocketConnectivity(): Promise<DailyWebsocketConnectivityTestResults>;
+  abortTestWebsocketConnectivity(): void;
+  testNetworkConnectivity(
+    videoTrack: MediaStreamTrack
+  ): Promise<DailyNetworkConnectivityTestStats>;
+  abortTestNetworkConnectivity(): void;
   getNetworkStats(): Promise<DailyNetworkStats>;
   getCpuLoadStats(): Promise<DailyCpuLoadStats>;
   updateSendSettings(settings: DailySendSettings): Promise<DailySendSettings>;
