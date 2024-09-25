@@ -91,6 +91,7 @@ export type DailyEvent =
   | 'local-audio-level'
   | 'remote-participants-audio-level'
   | 'dialin-connected'
+  | 'dialin-ready'
   | 'dialin-error'
   | 'dialin-stopped'
   | 'dialin-warning'
@@ -971,6 +972,7 @@ export interface DailyEventObjectAppMessage extends DailyEventObjectBase {
 export interface DailyEventObjectTranscriptionMessage
   extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'transcription-message'>;
+  instanceId?: string;
   participantId: string;
   text: string;
   timestamp: Date;
@@ -1029,6 +1031,7 @@ export interface DailyEventObjectLiveStreamingStopped
 export interface DailyEventObjectTranscriptionStarted
   extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'transcription-started'>;
+  instanceId: string;
   transcriptId?: string;
   language: string;
   model: string;
@@ -1045,12 +1048,14 @@ export interface DailyEventObjectTranscriptionStarted
 export interface DailyEventObjectTranscriptionStopped
   extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'transcription-stopped'>;
+  instanceId: string;
   updatedBy: string;
 }
 
 export interface DailyEventObjectTranscriptionError
   extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'transcription-error'>;
+  instanceId: string;
   errorMsg?: string;
 }
 export interface DailyEventObjectRemoteMediaPlayerUpdate
@@ -1073,6 +1078,8 @@ export interface DailyEventObjectRemoteMediaPlayerStopped
 }
 export interface DailyEventObjectDialinConnected extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialin-connected'>;
+  sipHeaders?: Record<string, any>;
+  sipFrom?: string;
   actionTraceId?: string;
 }
 
@@ -1084,6 +1091,8 @@ export interface DailyEventObjectDialinError extends DailyEventObjectBase {
 
 export interface DailyEventObjectDialinStopped extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialin-stopped'>;
+  sipHeaders?: Record<string, any>;
+  sipFrom?: string;
   actionTraceId?: string;
 }
 
@@ -1419,7 +1428,19 @@ export interface DailyTranscriptionDeepgramOptions {
   punctuate?: boolean;
   extra?: Record<string, any>;
   includeRawResponse?: boolean;
+  instanceId?: string;
+  participants?: Array<string>;
 }
+
+export interface DailyTranscriptionUpdateOptions {
+  instanceId?: string;
+  participants: Array<string>;
+}
+
+export interface DailyTranscriptionStopOptions {
+  instanceId?: string;
+}
+
 
 export type DailyDialOutAudioCodecs = 'PCMU' | 'OPUS' | 'G722' | 'PCMA';
 
@@ -1453,6 +1474,16 @@ export interface DailyStartDialoutPhoneOptions {
 export type DailyStartDialoutOptions =
   | DailyStartDialoutSipOptions
   | DailyStartDialoutPhoneOptions;
+
+export interface DailySipCallTransferOptions {
+  sessionId: string;
+  toEndPoint: string;
+}
+
+export interface DailySipReferOptions {
+  sessionId: string;
+  toEndPoint: string;
+}
 
 export interface DailyCall {
   callClientId: string;
@@ -1549,7 +1580,8 @@ export interface DailyCall {
     options: DailyRemoteMediaPlayerUpdateOptions
   ): Promise<DailyRemoteMediaPlayerInfo>;
   startTranscription(options?: DailyTranscriptionDeepgramOptions): void;
-  stopTranscription(): void;
+  updateTranscription(options: DailyTranscriptionUpdateOptions): void;
+  stopTranscription(options?: DailyTranscriptionStopOptions): void;
   preAuth(properties?: DailyCallOptions): Promise<{ access: DailyAccess }>;
   load(properties?: DailyLoadOptions): Promise<void>;
   startScreenShare(properties?: DailyStartScreenShare): void;
@@ -1607,6 +1639,8 @@ export interface DailyCall {
   ): Promise<{ session?: DailyDialOutSession }>;
   stopDialOut(options: { sessionId: string }): Promise<void>;
   sendDTMF(options: { sessionId: string; tones: string }): Promise<void>;
+  sipCallTransfer(options: DailySipCallTransferOptions): Promise<void>;
+  sipRefer(options: DailySipReferOptions): Promise<void>;
 }
 
 declare const Daily: DailyCallFactory & DailyCallStaticUtils;
