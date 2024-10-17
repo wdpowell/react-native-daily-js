@@ -213,7 +213,15 @@ export interface DailyAdvancedConfig {
    */
   v2CamAndMic?: boolean;
   micAudioMode?: 'music' | 'speech';
+  /**
+   * @deprecated This property will be removed. Instead, use inputSettings,
+   *             which is found in DailyCallOptions.
+   */
   userMediaAudioConstraints?: MediaTrackConstraints;
+  /**
+   * @deprecated This property will be removed. Instead, use inputSettings,
+   *             which is found in DailyCallOptions.
+   */
   userMediaVideoConstraints?: MediaTrackConstraints;
   preferH264ForCam?: boolean;
   h264Profile?: string;
@@ -424,6 +432,12 @@ export interface DailyVideoElementInfo {
   video_height: number;
 }
 
+/**
+ * DailyDeviceInfos reports the device information for the camera, mic, and
+ * speaker currently in use or expected. If the given device has not been
+ * specified and has not yet been acquired, the object will be empty ({}).
+ * The object will also be empty if a custom track has been provided.
+ */
 export interface DailyDeviceInfos {
   camera: {} | MediaDeviceInfo;
   mic: {} | MediaDeviceInfo;
@@ -711,6 +725,23 @@ export interface DailyReceiveSettingsUpdates {
   [participantIdOrBaseOrStar: string]:
     | DailySingleParticipantReceiveSettingsUpdates
     | 'inherit';
+}
+
+export interface DailyInputSettings {
+  audio?: DailyInputAudioSettings;
+  video?: DailyInputVideoSettings;
+}
+
+export interface DailyCustomTrackSettings {
+  customTrack: MediaStreamTrack;
+}
+
+export interface DailyInputAudioSettings {
+  settings?: MediaTrackConstraints | DailyCustomTrackSettings;
+}
+
+export interface DailyInputVideoSettings {
+  settings?: MediaTrackConstraints | DailyCustomTrackSettings;
 }
 
 export type DailyEventObjectBase = {
@@ -1540,6 +1571,9 @@ export interface DailyCall {
   updateReceiveSettings(
     receiveSettings: DailyReceiveSettingsUpdates
   ): Promise<DailyReceiveSettings>;
+  updateInputSettings(
+    inputSettings: DailyInputSettings
+  ): Promise<{ inputSettings: DailyInputSettings }>;
   startCamera(properties?: DailyCallOptions): Promise<void>;
   startLocalAudioLevelObserver(interval?: number): Promise<void>;
   isLocalAudioLevelObserverRunning(): boolean;
