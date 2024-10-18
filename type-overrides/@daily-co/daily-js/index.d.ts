@@ -208,6 +208,9 @@ export interface DailyAdvancedConfig {
    * @deprecated This property will be removed. Instead, use sendSettings, which is found in DailyCallOptions.
    */
   camSimulcastEncodings?: CamSimulcastEncoding[];
+  /**
+   * @deprecated This property will be removed. All calls use v2CamAndMic.
+   */
   v2CamAndMic?: boolean;
   micAudioMode?: 'music' | 'speech';
   userMediaAudioConstraints?: MediaTrackConstraints;
@@ -1440,7 +1443,6 @@ export interface DailyTranscriptionUpdateOptions {
 export interface DailyTranscriptionStopOptions {
   instanceId?: string;
 }
-
 
 export type DailyDialOutAudioCodecs = 'PCMU' | 'OPUS' | 'G722' | 'PCMA';
 
