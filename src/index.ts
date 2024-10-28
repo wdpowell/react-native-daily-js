@@ -100,6 +100,7 @@ function setupGlobals(): void {
 
   // A shim to prevent errors in call machine bundle (not ideal)
   global.window.addEventListener = () => {};
+  global.window.removeEventListener = () => {};
   global.btoa = btoa;
   global.atob = atob;
 
