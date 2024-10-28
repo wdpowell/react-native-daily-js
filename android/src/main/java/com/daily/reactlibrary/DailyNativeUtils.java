@@ -2,7 +2,9 @@ package com.daily.reactlibrary;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
@@ -129,10 +131,33 @@ public class DailyNativeUtils extends ReactContextBaseJavaModule implements Perm
         return true;
     }
 
+    private List<String> getDeclaredPermissions(Context context) {
+        List<String> declaredPermissions = new ArrayList<>();
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(),
+                    PackageManager.GET_PERMISSIONS
+            );
+            // Check if permissions are requested
+            if (packageInfo.requestedPermissions != null) {
+                declaredPermissions = Arrays.asList(packageInfo.requestedPermissions);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return declaredPermissions;
+    }
+
     private void checkPermissions() {
+        Context applicationContext = this.reactContext.getApplicationContext();
+        List<String> declaredPermissions = this.getDeclaredPermissions(applicationContext);
         List<String> permissionList = new ArrayList<String>();
-        permissionList.add(Manifest.permission.CAMERA);
-        permissionList.add(Manifest.permission.RECORD_AUDIO);
+        if (declaredPermissions.contains(Manifest.permission.FOREGROUND_SERVICE_CAMERA)) {
+            permissionList.add(Manifest.permission.CAMERA);
+        }
+        if (declaredPermissions.contains(Manifest.permission.FOREGROUND_SERVICE_MICROPHONE)) {
+            permissionList.add(Manifest.permission.RECORD_AUDIO);
+        }
         if (Build.VERSION.SDK_INT >= 33) {
             permissionList.add(Manifest.permission.POST_NOTIFICATIONS);
         }
