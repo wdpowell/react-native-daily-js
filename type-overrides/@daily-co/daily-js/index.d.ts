@@ -213,15 +213,7 @@ export interface DailyAdvancedConfig {
    */
   v2CamAndMic?: boolean;
   micAudioMode?: 'music' | 'speech';
-  /**
-   * @deprecated This property will be removed. Instead, use inputSettings,
-   *             which is found in DailyCallOptions.
-   */
   userMediaAudioConstraints?: MediaTrackConstraints;
-  /**
-   * @deprecated This property will be removed. Instead, use inputSettings,
-   *             which is found in DailyCallOptions.
-   */
   userMediaVideoConstraints?: MediaTrackConstraints;
   preferH264ForCam?: boolean;
   h264Profile?: string;
