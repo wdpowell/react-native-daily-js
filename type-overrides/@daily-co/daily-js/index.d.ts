@@ -523,8 +523,23 @@ export interface DailyNetworkConnectivityTestStats {
   result: 'passed' | 'failed' | 'aborted';
 }
 
+export type networkStateReasons =
+  | 'sendPacketLoss'
+  | 'recvPacketLoss'
+  | 'roundTripTime'
+  | 'availableOutgoingBitrate';
+
 export interface DailyNetworkStats {
+  /**
+   * @deprecated This property will is being replaced by networkState.
+   */
   quality: number;
+  /**
+   * @deprecated This property will is being replaced by networkState.
+   */
+  threshold: 'good' | 'low' | 'very-low';
+  networkState: 'good' | 'warning' | 'bad' | 'unknown';
+  networkStateReasons?: networkStateReasons[];
   stats: {
     latest: {
       timestamp: number;
@@ -557,7 +572,6 @@ export interface DailyNetworkStats {
     worstAudioSendJitter: number;
     averageNetworkRoundTripTime: number | null;
   };
-  threshold: 'good' | 'low' | 'very-low';
 }
 
 export interface DailyCpuLoadStats {
