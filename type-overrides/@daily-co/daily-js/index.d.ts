@@ -380,6 +380,10 @@ export interface DailyParticipant {
   userData?: unknown;
   session_id: string;
   joined_at?: Date;
+  networkQualityState?: 'good' | 'warning' | 'bad' | 'unknown';
+  /**
+   * @deprecated This property will is being replaced by networkState.
+   */
   networkThreshold?: 'good' | 'low' | 'very-low';
   will_eject_at: Date;
   local: boolean;
