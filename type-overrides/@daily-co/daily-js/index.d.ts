@@ -1563,6 +1563,7 @@ export type DailyStartDialoutOptions =
 export interface DailySipCallTransferOptions {
   sessionId: string;
   toEndPoint: string;
+  callerId?: string;
 }
 
 export interface DailySipReferOptions {
