@@ -1162,6 +1162,12 @@ export interface DailyEventObjectRemoteMediaPlayerStopped
   updatedBy: string;
   reason: DailyRemoteMediaPlayerStopReason;
 }
+
+export interface DailyEventObjectDialinReady extends DailyEventObjectBase {
+  action: Extract<DailyEvent, 'dialin-ready'>;
+  sipEndpoint: string;
+}
+
 export interface DailyEventObjectDialinConnected extends DailyEventObjectBase {
   action: Extract<DailyEvent, 'dialin-connected'>;
   sipHeaders?: Record<string, any>;
@@ -1289,6 +1295,8 @@ export type DailyEventObject<T extends DailyEvent = any> =
     ? DailyEventObjectAvailableDevicesUpdated
     : T extends DailyEventObjectSendSettingsUpdated['action']
     ? DailyEventObjectSendSettingsUpdated
+    : T extends DailyEventObjectDialinReady['action']
+    ? DailyEventObjectDialinReady
     : T extends DailyEventObjectDialinConnected['action']
     ? DailyEventObjectDialinConnected
     : T extends DailyEventObjectDialinError['action']
