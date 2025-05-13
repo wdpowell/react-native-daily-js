@@ -17,6 +17,7 @@ import {
 import 'react-native-get-random-values';
 const { DailyNativeUtils, WebRTCModule } = NativeModules;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const global: any;
 
 const webRTCEventEmitter = new NativeEventEmitter(WebRTCModule);
@@ -27,9 +28,8 @@ let appState: AppStateStatus;
 const audioFocusChangeListeners: Set<(hasFocus: boolean) => void> = new Set();
 
 export type DailyAppStateEvent = 'active' | 'inactive' | 'destroyed';
-const appStateChangeListeners: Set<
-  (appState: DailyAppStateEvent) => void
-> = new Set();
+const appStateChangeListeners: Set<(appState: DailyAppStateEvent) => void> =
+  new Set();
 
 const systemScreenCaptureStopListeners: Set<() => void> = new Set();
 let systemScreenCaptureStartCallback: { (): void } | null;
@@ -124,7 +124,16 @@ function setupGlobals(): void {
   }
 
   global.DailyNativeUtils = {
-    ...DailyNativeUtils,
+    //With React Native new architecture the Native modules are lazily initialized
+    //As a result ...DailyNativeUtils won't work as expected because the actual properties aren't there yet.
+    //New architecture known limitations: https://github.com/reactwg/react-native-new-architecture/discussions/237
+    //With this approach mentioning each function, everything works fine with the compatibility layer.
+    //More details about the compatibility layer here: https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#gradual-migration
+    setKeepDeviceAwake: DailyNativeUtils.setKeepDeviceAwake,
+    setShowOngoingMeetingNotification: DailyNativeUtils.setShowOngoingMeetingNotification,
+    presentSystemScreenCapturePrompt: DailyNativeUtils.presentSystemScreenCapturePrompt,
+    requestStopSystemScreenCapture: DailyNativeUtils.requestStopSystemScreenCapture,
+    isScreenBeingCaptured: DailyNativeUtils.isScreenBeingCaptured,
     isIOS: Platform.OS === 'ios',
     isAndroid: Platform.OS === 'android',
     setAudioMode: WebRTCModule.setDailyAudioMode,

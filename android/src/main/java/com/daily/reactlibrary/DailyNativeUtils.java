@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Process;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -18,10 +19,10 @@ import androidx.fragment.app.FragmentActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
@@ -197,5 +198,21 @@ public class DailyNativeUtils extends ReactContextBaseJavaModule implements Perm
         } else {
             DailyOngoingMeetingForegroundService.stop(reactContext);
         }
+    }
+
+    @ReactMethod
+    public void presentSystemScreenCapturePrompt() {
+        Log.d(TAG, "presentSystemScreenCapturePrompt is not available on Android");
+    }
+
+    @ReactMethod
+    public void requestStopSystemScreenCapture() {
+        Log.d(TAG, "requestStopSystemScreenCapture is not available on Android");
+    }
+
+    @ReactMethod
+    public void isScreenBeingCaptured(Promise promise) {
+        Log.d(TAG, "isScreenBeingCaptured is not available on Android");
+        promise.resolve(false);
     }
 }
