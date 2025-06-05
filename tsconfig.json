@@ -12,6 +12,7 @@
     "declaration": true,
     "paths": {
       "@daily-co/daily-js": ["type-overrides/@daily-co/daily-js"]
-    }
+    },
+    "types": ["react", "react-native"]
   }
 }

@@ -167,6 +167,15 @@ RCT_REMAP_METHOD(isScreenBeingCaptured,
   }
 }
 
+RCT_EXPORT_METHOD(setShowOngoingMeetingNotification:(BOOL)show
+                  title:(NSString *)title
+                  subtitle:(NSString *)subtitle
+                  iconName:(NSString *)iconName
+                  requesterId:(NSString *)requesterId)
+{
+  RCTLogInfo(@"setShowOngoingMeetingNotification is not available on iOS");
+}
+
 #pragma mark Private
 
 + (void)dispatchSyncOnMain:(void (^)(void))block
