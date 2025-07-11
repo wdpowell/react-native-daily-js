@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@daily-co/daily-js": "^0.80.0",
+    "@expo/config-plugins": "^10.1.2",
     "@types/react-native-background-timer": "^2.0.0",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "^1.1.2"
@@ -50,6 +51,7 @@
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@types/base-64": "^1.0.0",
     "@types/react": "18.3.21",
+    "@types/react-native": "^0.72.8",
     "react-native": "0.76.9",
     "react-native-background-timer": "^2.4.1",
     "typescript": "^5.8.3"
