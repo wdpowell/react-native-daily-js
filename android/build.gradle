@@ -66,6 +66,7 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+    implementation 'co.daily:client:0.31.0'
 
     //For dev only
     //implementation 'com.facebook.react:react-android:0.76.9'  // From node_modules

@@ -19,34 +19,8 @@ declare const global: any;
 // https://github.com/uuidjs/uuid#getrandomvalues-not-supported
 import 'react-native-get-random-values';
 
-function safeProxy<T extends object>(target: T | null | undefined, fallback: Partial<T> = {}): T {
-  return new Proxy(target || {}, {
-    get(obj, prop: string) {
-      if (prop in obj) return (obj as any)[prop];
-      if (typeof (fallback as any)[prop] === 'function') return (fallback as any)[prop];
-      return () => {};
-    },
-  }) as T;
-}
-
-const SafeDailyNativeUtils = safeProxy(NativeModules.DailyNativeUtils, {
-  startMediaDevicesEventMonitor: () => {},
-  setKeepDeviceAwake: () => {},
-  setShowOngoingMeetingNotification: () => {},
-  presentSystemScreenCapturePrompt: () => {},
-  requestStopSystemScreenCapture: () => {},
-  isScreenBeingCaptured: () => false,
-});
-
-const SafeWebRTCModule = safeProxy(NativeModules.WebRTCModule, {
-  setDailyAudioMode: () => {},
-  setAudioDevice: () => {},
-  getAudioDevice: () => null,
-  enableNoOpRecordingEnsuringBackgroundContinuity: () => {},
-});
-
-const webRTCEventEmitter = new NativeEventEmitter(SafeWebRTCModule);
-const dailyNativeUtilsEventEmitter = new NativeEventEmitter(SafeDailyNativeUtils);
+const webRTCEventEmitter = new NativeEventEmitter(NativeModules.WebRTCModule);
+const dailyNativeUtilsEventEmitter = new NativeEventEmitter(NativeModules.DailyNativeUtils);
 
 let hasAudioFocus: boolean;
 let appState: AppStateStatus;
@@ -149,18 +123,18 @@ function setupGlobals(): void {
   }
 
   global.DailyNativeUtils = {
-    startMediaDevicesEventMonitor: SafeDailyNativeUtils.startMediaDevicesEventMonitor,
-    setKeepDeviceAwake: SafeDailyNativeUtils.setKeepDeviceAwake,
-    setShowOngoingMeetingNotification: SafeDailyNativeUtils.setShowOngoingMeetingNotification,
-    presentSystemScreenCapturePrompt: SafeDailyNativeUtils.presentSystemScreenCapturePrompt,
-    requestStopSystemScreenCapture: SafeDailyNativeUtils.requestStopSystemScreenCapture,
-    isScreenBeingCaptured: SafeDailyNativeUtils.isScreenBeingCaptured,
+    startMediaDevicesEventMonitor: NativeModules.DailyNativeUtils?.startMediaDevicesEventMonitor,
+    setKeepDeviceAwake: NativeModules.DailyNativeUtils?.setKeepDeviceAwake,
+    setShowOngoingMeetingNotification: NativeModules.DailyNativeUtils?.setShowOngoingMeetingNotification,
+    presentSystemScreenCapturePrompt: NativeModules.DailyNativeUtils?.presentSystemScreenCapturePrompt,
+    requestStopSystemScreenCapture: NativeModules.DailyNativeUtils?.requestStopSystemScreenCapture,
+    isScreenBeingCaptured: NativeModules.DailyNativeUtils?.isScreenBeingCaptured,
     isIOS: Platform.OS === 'ios',
     isAndroid: Platform.OS === 'android',
-    setAudioMode: SafeWebRTCModule.setDailyAudioMode,
-    setAudioDevice: SafeWebRTCModule.setAudioDevice,
-    getAudioDevice: SafeWebRTCModule.getAudioDevice,
-    enableNoOpRecordingEnsuringBackgroundContinuity: SafeWebRTCModule.enableNoOpRecordingEnsuringBackgroundContinuity,
+    setAudioMode: NativeModules.WebRTCModule?.setDailyAudioMode,
+    setAudioDevice: NativeModules.WebRTCModule?.setAudioDevice,
+    getAudioDevice: NativeModules.WebRTCModule?.getAudioDevice,
+    enableNoOpRecordingEnsuringBackgroundContinuity: NativeModules.WebRTCModule?.enableNoOpRecordingEnsuringBackgroundContinuity,
     addAudioFocusChangeListener: (listener: (hasFocus: boolean) => void) => {
       audioFocusChangeListeners.add(listener);
     },

@@ -1,18 +1,19 @@
 package com.daily.reactlibrary;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class DailyNativeUtilsPackage implements ReactPackage {
+public class DailyPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(new DailyNativeUtils(reactContext));
+        List<NativeModule> modules = new ArrayList<>();
+        modules.add(new DailyModule(reactContext));
+        return modules;
     }
 
     @Override
