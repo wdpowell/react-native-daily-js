@@ -12,16 +12,41 @@ import {
   AppState,
   AppStateStatus,
 } from 'react-native';
-// Preventing RN issue getrandomvalues not supported
-// https://github.com/uuidjs/uuid#getrandomvalues-not-supported
-import 'react-native-get-random-values';
-const { DailyNativeUtils, WebRTCModule } = NativeModules;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const global: any;
 
-const webRTCEventEmitter = new NativeEventEmitter(WebRTCModule);
-const dailyNativeUtilsEventEmitter = new NativeEventEmitter(DailyNativeUtils);
+// https://github.com/uuidjs/uuid#getrandomvalues-not-supported
+import 'react-native-get-random-values';
+
+function safeProxy<T extends object>(target: T | null | undefined, fallback: Partial<T> = {}): T {
+  return new Proxy(target || {}, {
+    get(obj, prop: string) {
+      if (prop in obj) return (obj as any)[prop];
+      if (typeof (fallback as any)[prop] === 'function') return (fallback as any)[prop];
+      return () => {};
+    },
+  }) as T;
+}
+
+const SafeDailyNativeUtils = safeProxy(NativeModules.DailyNativeUtils, {
+  startMediaDevicesEventMonitor: () => {},
+  setKeepDeviceAwake: () => {},
+  setShowOngoingMeetingNotification: () => {},
+  presentSystemScreenCapturePrompt: () => {},
+  requestStopSystemScreenCapture: () => {},
+  isScreenBeingCaptured: () => false,
+});
+
+const SafeWebRTCModule = safeProxy(NativeModules.WebRTCModule, {
+  setDailyAudioMode: () => {},
+  setAudioDevice: () => {},
+  getAudioDevice: () => null,
+  enableNoOpRecordingEnsuringBackgroundContinuity: () => {},
+});
+
+const webRTCEventEmitter = new NativeEventEmitter(SafeWebRTCModule);
+const dailyNativeUtilsEventEmitter = new NativeEventEmitter(SafeDailyNativeUtils);
 
 let hasAudioFocus: boolean;
 let appState: AppStateStatus;
@@ -124,23 +149,18 @@ function setupGlobals(): void {
   }
 
   global.DailyNativeUtils = {
-    //With React Native new architecture the Native modules are lazily initialized
-    //As a result ...DailyNativeUtils won't work as expected because the actual properties aren't there yet.
-    //New architecture known limitations: https://github.com/reactwg/react-native-new-architecture/discussions/237
-    //With this approach mentioning each function, everything works fine with the compatibility layer.
-    //More details about the compatibility layer here: https://reactnative.dev/blog/2024/10/23/the-new-architecture-is-here#gradual-migration
-    setKeepDeviceAwake: DailyNativeUtils.setKeepDeviceAwake,
-    setShowOngoingMeetingNotification: DailyNativeUtils.setShowOngoingMeetingNotification,
-    presentSystemScreenCapturePrompt: DailyNativeUtils.presentSystemScreenCapturePrompt,
-    requestStopSystemScreenCapture: DailyNativeUtils.requestStopSystemScreenCapture,
-    isScreenBeingCaptured: DailyNativeUtils.isScreenBeingCaptured,
+    startMediaDevicesEventMonitor: SafeDailyNativeUtils.startMediaDevicesEventMonitor,
+    setKeepDeviceAwake: SafeDailyNativeUtils.setKeepDeviceAwake,
+    setShowOngoingMeetingNotification: SafeDailyNativeUtils.setShowOngoingMeetingNotification,
+    presentSystemScreenCapturePrompt: SafeDailyNativeUtils.presentSystemScreenCapturePrompt,
+    requestStopSystemScreenCapture: SafeDailyNativeUtils.requestStopSystemScreenCapture,
+    isScreenBeingCaptured: SafeDailyNativeUtils.isScreenBeingCaptured,
     isIOS: Platform.OS === 'ios',
     isAndroid: Platform.OS === 'android',
-    setAudioMode: WebRTCModule.setDailyAudioMode,
-    setAudioDevice: WebRTCModule.setAudioDevice,
-    getAudioDevice: WebRTCModule.getAudioDevice,
-    enableNoOpRecordingEnsuringBackgroundContinuity:
-      WebRTCModule.enableNoOpRecordingEnsuringBackgroundContinuity,
+    setAudioMode: SafeWebRTCModule.setDailyAudioMode,
+    setAudioDevice: SafeWebRTCModule.setAudioDevice,
+    getAudioDevice: SafeWebRTCModule.getAudioDevice,
+    enableNoOpRecordingEnsuringBackgroundContinuity: SafeWebRTCModule.enableNoOpRecordingEnsuringBackgroundContinuity,
     addAudioFocusChangeListener: (listener: (hasFocus: boolean) => void) => {
       audioFocusChangeListeners.add(listener);
     },
